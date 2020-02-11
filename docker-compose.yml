@@ -5,6 +5,9 @@ services:
     build: serverlist_api
     ports:
       - 8080:8080
+  
+  converter:
+    build: api_converter
 
   redis:
     image: redis:alpine
