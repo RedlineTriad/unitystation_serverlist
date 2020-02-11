@@ -15,7 +15,6 @@ async fn heartbeat(
     let info = info.into_inner();
     let json = serde_json::to_string(&info)?;
     let key = format!("{}:{}", info.ip, info.port);
-    println!("----> Adding server, key: {}, value: {}", key, json);
     
     let res = redis.send(Command(resp_array!["SET", key, json, "EX", "15"]))
         .await?;
@@ -39,7 +38,6 @@ async fn get_stuff(redis: web::Data<Addr<RedisActor>>) -> Result<HttpResponse, A
 
     match res {
         Ok(RespValue::Array(x)) => {
-            println!("res: {:?}", x.clone());
             let keys = x.into_iter().filter_map(|value| {
                 match value {
                     RespValue::BulkString(key) => {Some(key)}
@@ -84,7 +82,7 @@ async fn get_stuff(redis: web::Data<Addr<RedisActor>>) -> Result<HttpResponse, A
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    std::env::set_var("RUST_LOG", "actix_web=trace,actix_redis=trace");
+    std::env::set_var("RUST_LOG", "actix_web=warn,actix_redis=warn");
     env_logger::init();
 
     HttpServer::new(|| {
